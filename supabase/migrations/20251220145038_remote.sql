@@ -1,0 +1,2 @@
+-- Placeholder migration to align with remote history.
+-- Original contents exist only in the remote database.
