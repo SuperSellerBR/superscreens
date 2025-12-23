@@ -115,12 +115,13 @@ function UserSelector() {
 }
 
 function RemoteInterface({ userId, isAdmin }: { userId: string, isAdmin: boolean }) {
-  const { isConnected, isPlayerActive, status, play, pause, next, prev, toggleMute, removeFromQueue, clearQueue, reload, toggleTicker, toggleLayout, toggleShuffle } = usePlayerControl(userId);
+  const { isConnected, isPlayerActive, status, play, pause, next, prev, toggleMute, setVolume, removeFromQueue, clearQueue, reload, toggleTicker, toggleLayout, toggleShuffle } = usePlayerControl(userId);
   const [playlist, setPlaylist] = useState<any[]>([]);
   const [showPlaylists, setShowPlaylists] = useState(false);
   const [availablePlaylists, setAvailablePlaylists] = useState<any[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState("");
+  const [volume, setVolumeState] = useState(100);
   const navigate = useNavigate();
   const MarqueeText = ({ text, className, textClassName }: { text: string; className?: string; textClassName?: string; }) => {
     const containerRef = useRef<HTMLSpanElement>(null);
@@ -166,6 +167,68 @@ function RemoteInterface({ userId, isAdmin }: { userId: string, isAdmin: boolean
       </span>
     );
   };
+
+  useEffect(() => {
+    if (typeof status.volume === "number") {
+      setVolumeState(status.volume);
+    }
+  }, [status.volume]);
+
+  useEffect(() => {
+    const isTextInput = (el: HTMLElement | null) => {
+      if (!el) return false;
+      const tag = el.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+    };
+
+    const handleMediaKeys = (event: KeyboardEvent) => {
+      if (isTextInput(document.activeElement as HTMLElement | null)) return;
+      const code = event.code || event.key;
+      const lower = String(code);
+
+      if (["MediaPlayPause"].includes(lower)) {
+        event.preventDefault();
+        status.isPlaying ? pause() : play();
+        return;
+      }
+      if (["MediaTrackNext"].includes(lower)) {
+        event.preventDefault();
+        next();
+        return;
+      }
+      if (["MediaTrackPrevious"].includes(lower)) {
+        event.preventDefault();
+        prev();
+        return;
+      }
+      if (["MediaStop"].includes(lower)) {
+        event.preventDefault();
+        pause();
+        return;
+      }
+      if (["AudioVolumeMute", "VolumeMute"].includes(lower)) {
+        event.preventDefault();
+        toggleMute();
+        return;
+      }
+      if (["AudioVolumeUp", "VolumeUp"].includes(lower)) {
+        event.preventDefault();
+        const nextVolume = Math.min(100, volume + 10);
+        setVolumeState(nextVolume);
+        setVolume(nextVolume);
+        return;
+      }
+      if (["AudioVolumeDown", "VolumeDown"].includes(lower)) {
+        event.preventDefault();
+        const nextVolume = Math.max(0, volume - 10);
+        setVolumeState(nextVolume);
+        setVolume(nextVolume);
+      }
+    };
+
+    window.addEventListener("keydown", handleMediaKeys);
+    return () => window.removeEventListener("keydown", handleMediaKeys);
+  }, [status.isPlaying, pause, play, next, prev, toggleMute, setVolume, volume]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
