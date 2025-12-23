@@ -289,7 +289,10 @@ export function useTVPlayerLogic() {
           switch (payload.action) {
               case 'PLAY': setIsPlaying(true); break;
               case 'PAUSE': setIsPlaying(false); break;
-              case 'NEXT': handleNextRef.current(); break;
+              case 'NEXT':
+                 setIsPlaying(true);
+                 handleNextRef.current();
+                 break;
               case 'PREV': 
                  setCurrentIndex(curr => {
                      const len = playlistRef.current.length;
