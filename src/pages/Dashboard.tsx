@@ -16,7 +16,7 @@ import {
   Area
 } from "recharts";
 import { Loader2, Tv, TrendingUp, DollarSign, Activity, AlertCircle, Monitor, Search, Filter, Maximize2, X, ChevronLeft, ChevronRight, Clock, Music, Trophy } from "lucide-react";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../utils/supabase/info";
 import { supabase } from "../utils/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -99,7 +99,7 @@ export default function Dashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/dashboard/stats?t=${Date.now()}`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/dashboard/stats?t=${Date.now()}`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
       
@@ -114,7 +114,7 @@ export default function Dashboard() {
 
   const fetchClients = async () => {
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/users`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
       if (res.ok) {
