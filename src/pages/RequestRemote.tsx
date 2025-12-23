@@ -315,7 +315,8 @@ export default function RequestRemote() {
             },
             body: JSON.stringify({
                 title: item.title,
-                id: item.id
+                id: item.id,
+                userId: userId || undefined
             })
         });
 

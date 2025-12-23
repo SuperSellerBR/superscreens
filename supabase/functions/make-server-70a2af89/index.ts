@@ -1151,6 +1151,8 @@ app.post("/make-server-70a2af89/jukebox/request", async (c) => {
         const body = await c.req.json();
         const title = body.title || "Música desconhecida";
         const user = await getUser(c);
+        const fallbackUserId = body.userId || c.req.query('uid') || null;
+        const targetUserId = user?.id || (fallbackUserId && isUuid(fallbackUserId) ? fallbackUserId : null);
         
         // Log to activity stream
         await logActivity(`Jukebox: ${title}`, 'jukebox');
@@ -1158,7 +1160,7 @@ app.post("/make-server-70a2af89/jukebox/request", async (c) => {
         const { error: jukeboxInsertError } = await supabase
           .from("jukebox_requests")
           .insert({
-            user_id: user?.id || null,
+            user_id: targetUserId,
             title
           });
         if (jukeboxInsertError) throw jukeboxInsertError;
@@ -1224,7 +1226,10 @@ app.get("/make-server-70a2af89/dashboard/stats", async (c) => {
       if (profile?.role) userRole = profile.role;
     }
 
-    if (user?.id && userRole === "client") {
+    const isClient =
+      !!user?.id && userRole !== "admin" && userRole !== "advertiser";
+
+    if (user?.id && isClient) {
       const clientId = user.id;
       const since = new Date();
       since.setDate(since.getDate() - 6);
