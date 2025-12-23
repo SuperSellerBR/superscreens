@@ -26,7 +26,7 @@ import { ModeToggle } from "../mode-toggle";
 
 const MENU_ITEMS = [
   { label: "Início", icon: Home, path: "/client/home", roles: ['client'] },
-  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard", roles: ['admin', 'advertiser'] },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard", roles: ['admin', 'advertiser', 'client'] },
   { label: "Gerenciador de Conteúdos", icon: ImageIcon, path: "/admin/content", roles: ['admin', 'client', 'advertiser'] },
   { label: "Criador de Playlist", icon: ListVideo, path: "/admin/playlist", roles: ['admin', 'client', 'advertiser'] },
   { label: "Usuários", icon: Users, path: "/admin/users", roles: ['admin'] },

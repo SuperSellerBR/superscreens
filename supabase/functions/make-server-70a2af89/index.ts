@@ -1213,6 +1213,69 @@ app.post("/make-server-70a2af89/jukebox/request", async (c) => {
 
 app.get("/make-server-70a2af89/dashboard/stats", async (c) => {
   try {
+    const user = await getUser(c);
+    let userRole: string | null = user?.user_metadata?.role || null;
+    if (user?.id) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (profile?.role) userRole = profile.role;
+    }
+
+    if (user?.id && userRole === "client") {
+      const clientId = user.id;
+      const since = new Date();
+      since.setDate(since.getDate() - 6);
+      const sinceIso = new Date(
+        Date.UTC(since.getFullYear(), since.getMonth(), since.getDate(), 0, 0, 0)
+      ).toISOString();
+
+      const [jukeboxCountRow, jukeboxRows] = await Promise.all([
+        supabase
+          .from("jukebox_requests")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", clientId),
+        supabase
+          .from("jukebox_requests")
+          .select("title, created_at")
+          .eq("user_id", clientId)
+          .gte("created_at", sinceIso)
+          .order("created_at", { ascending: false })
+          .limit(200)
+      ]);
+
+      const recentActivity = (jukeboxRows.data || [])
+        .slice(0, 50)
+        .map((row: any) => ({
+          text: `Jukebox: ${row.title}`,
+          type: "jukebox",
+          time: row.created_at ? new Date(row.created_at).getTime() : Date.now()
+        }));
+
+      const jukeboxHistory: Record<string, number> = {};
+      (jukeboxRows.data || []).forEach((row: any) => {
+        const dateKey = row.created_at
+          ? new Date(row.created_at).toISOString().slice(0, 10)
+          : new Date().toISOString().slice(0, 10);
+        jukeboxHistory[dateKey] = (jukeboxHistory[dateKey] || 0) + 1;
+      });
+
+      return c.json({
+        onlineTvs: 0,
+        totalClients: 0,
+        onlineDevicesList: [],
+        mediaCount: 0,
+        activeAdvertisersCount: 0,
+        totalAdsDisplayed: 0,
+        jukeboxRequests: jukeboxCountRow.count || 0,
+        jukeboxHistory,
+        estimatedEarnings: 0,
+        recentActivity
+      });
+    }
+
     const onlineThreshold = new Date(Date.now() - (60 * 1000)).toISOString();
 
     const [

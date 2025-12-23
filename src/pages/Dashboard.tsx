@@ -19,6 +19,7 @@ import { Loader2, Tv, TrendingUp, DollarSign, Activity, AlertCircle, Monitor, Se
 import { supabaseUrl, publicAnonKey } from "../utils/supabase/info";
 import { supabase } from "../utils/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUserRole } from "../hooks/useUserRole";
 
 interface UserData {
   id: string;
@@ -32,6 +33,8 @@ interface UserData {
 }
 
 export default function Dashboard() {
+  const { role } = useUserRole();
+  const isClient = role === 'client';
   const [loading, setLoading] = useState(true);
   const [statsData, setStatsData] = useState({
     onlineTvs: 0,
@@ -100,7 +103,7 @@ export default function Dashboard() {
       if (!session) return;
 
       const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/dashboard/stats?t=${Date.now()}`, {
-        headers: { 'Authorization': `Bearer ${publicAnonKey}` }
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
       });
       
       if (res.ok) {
@@ -114,6 +117,7 @@ export default function Dashboard() {
 
   const fetchClients = async () => {
     try {
+      if (isClient) return;
       const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/users`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
@@ -394,6 +398,7 @@ export default function Dashboard() {
         </div>
 
         {/* Players Status Panel */}
+        {!isClient && (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
            <div className="flex flex-col sm:flex-row gap-4 mb-6 justify-between items-center">
                <h3 className="text-lg font-bold text-[#0F1C2E] dark:text-white">Players ({filteredClients.length})</h3>
@@ -438,8 +443,10 @@ export default function Dashboard() {
                </div>
            )}
         </div>
+        )}
 
         {/* KPI Cards */}
+        {!isClient && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <div className="flex justify-between items-start mb-4">
@@ -505,9 +512,10 @@ export default function Dashboard() {
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Baseado em contratos ativos e impressões</p>
             </div>
         </div>
+        )}
 
         {/* Full Screen Overlay */}
-        {isExpanded && (
+        {!isClient && isExpanded && (
             <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-950 overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <div className="min-h-screen p-6 md:p-8">
                     {/* Header */}
@@ -558,66 +566,97 @@ export default function Dashboard() {
             </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Device Health Chart */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h3 className="text-lg font-bold text-[#0F1C2E] dark:text-white mb-6">Saúde da Rede</h3>
-            <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                    <Pie
-                    data={deviceStatusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    >
-                    {deviceStatusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={0} />
-                    ))}
-                    </Pie>
-                    <Tooltip 
-                        contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
-                    />
-                    <Legend />
-                </PieChart>
-                </ResponsiveContainer>
+        {isClient ? (
+            <div className="grid grid-cols-1 gap-8">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <h3 className="text-lg font-bold text-[#0F1C2E] dark:text-white mb-6 flex items-center gap-2">
+                    <span className="text-pink-500">🎵</span> Pedidos Semanais ao Jukebox
+                </h3>
+                <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={jukeboxChartData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="dark:stroke-gray-700" />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280'}} className="dark:text-gray-400" />
+                        <YAxis axisLine={false} tickLine={false} allowDecimals={false} tick={{fill: '#6B7280'}} className="dark:text-gray-400" />
+                        <Tooltip 
+                            cursor={{fill: 'rgba(243, 244, 246, 0.5)'}}
+                            contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                            formatter={(value: number) => [value, 'Pedidos']}
+                            labelFormatter={(label, payload) => {
+                                if (payload && payload[0] && payload[0].payload) {
+                                    return payload[0].payload.fullDate;
+                                }
+                                return label;
+                            }}
+                        />
+                        <Bar dataKey="value" fill="#EC4899" radius={[4, 4, 0, 0]} barSize={40} />
+                    </BarChart>
+                    </ResponsiveContainer>
+                </div>
+                </div>
             </div>
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
-                Monitoramento em tempo real dos dispositivos
-            </div>
-            </div>
+        ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Device Health Chart */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <h3 className="text-lg font-bold text-[#0F1C2E] dark:text-white mb-6">Saúde da Rede</h3>
+                <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie
+                        data={deviceStatusData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        >
+                        {deviceStatusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={0} />
+                        ))}
+                        </Pie>
+                        <Tooltip 
+                            contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                        />
+                        <Legend />
+                    </PieChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
+                    Monitoramento em tempo real dos dispositivos
+                </div>
+                </div>
 
-            {/* Revenue Trend Chart */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h3 className="text-lg font-bold text-[#0F1C2E] dark:text-white mb-6 flex items-center gap-2">
-                <span className="text-pink-500">🎵</span> Pedidos Semanais ao Jukebox
-            </h3>
-            <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={jukeboxChartData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="dark:stroke-gray-700" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280'}} className="dark:text-gray-400" />
-                    <YAxis axisLine={false} tickLine={false} allowDecimals={false} tick={{fill: '#6B7280'}} className="dark:text-gray-400" />
-                    <Tooltip 
-                        cursor={{fill: 'rgba(243, 244, 246, 0.5)'}}
-                        contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
-                        formatter={(value: number) => [value, 'Pedidos']}
-                        labelFormatter={(label, payload) => {
-                            if (payload && payload[0] && payload[0].payload) {
-                                return payload[0].payload.fullDate;
-                            }
-                            return label;
-                        }}
-                    />
-                    <Bar dataKey="value" fill="#EC4899" radius={[4, 4, 0, 0]} barSize={40} />
-                </BarChart>
-                </ResponsiveContainer>
+                {/* Revenue Trend Chart */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <h3 className="text-lg font-bold text-[#0F1C2E] dark:text-white mb-6 flex items-center gap-2">
+                    <span className="text-pink-500">🎵</span> Pedidos Semanais ao Jukebox
+                </h3>
+                <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={jukeboxChartData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="dark:stroke-gray-700" />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280'}} className="dark:text-gray-400" />
+                        <YAxis axisLine={false} tickLine={false} allowDecimals={false} tick={{fill: '#6B7280'}} className="dark:text-gray-400" />
+                        <Tooltip 
+                            cursor={{fill: 'rgba(243, 244, 246, 0.5)'}}
+                            contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                            formatter={(value: number) => [value, 'Pedidos']}
+                            labelFormatter={(label, payload) => {
+                                if (payload && payload[0] && payload[0].payload) {
+                                    return payload[0].payload.fullDate;
+                                }
+                                return label;
+                            }}
+                        />
+                        <Bar dataKey="value" fill="#EC4899" radius={[4, 4, 0, 0]} barSize={40} />
+                    </BarChart>
+                    </ResponsiveContainer>
+                </div>
+                </div>
             </div>
-            </div>
-        </div>
+        )}
 
         {/* Jukebox Analytics Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -703,6 +742,7 @@ export default function Dashboard() {
         </div>
 
         {/* Commercial Performance (Share of Voice) */}
+        {!isClient && (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
@@ -803,11 +843,14 @@ export default function Dashboard() {
                 </div>
             </div>
         </div>
+        )}
 
         {/* Activity Log Table */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-                <h3 className="text-lg font-bold text-[#0F1C2E] dark:text-white">Logs do Sistema</h3>
+                <h3 className="text-lg font-bold text-[#0F1C2E] dark:text-white">
+                    {isClient ? 'Eventos' : 'Logs do Sistema'}
+                </h3>
             </div>
             <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
