@@ -18,6 +18,7 @@ interface NewsArticle {
 function NewsTicker({ rssUrl }: { rssUrl: string }) {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
+  const g1LogoUrl = "https://nsc.overgrowthseo.com.br/wp-content/uploads/2024/06/G1.webp";
 
   useEffect(() => {
     if (!rssUrl) return;
@@ -83,10 +84,50 @@ function NewsTicker({ rssUrl }: { rssUrl: string }) {
 
   if (!rssUrl) return null;
 
+  const renderNewsTitle = (title: string) => {
+    const match = title.match(/^\s*G1\s*>\s*(.*)$/i);
+    if (!match) return title;
+    const rest = (match[1] || "").trim();
+    return (
+      <span className="inline-flex items-center gap-3">
+        <img
+          src={g1LogoUrl}
+          alt="G1"
+          className="h-5 w-auto"
+          loading="eager"
+        />
+        <span>{rest || "Notícias"}</span>
+      </span>
+    );
+  };
+
+  const renderSourceLabel = (source: string) => {
+    const match = source.match(/^\s*G1\s*>\s*(.*)$/i);
+    if (!match) return source;
+    const rest = (match[1] || "").trim();
+    return (
+      <span className="inline-flex items-center gap-3">
+        <span
+          className="inline-flex items-center justify-center rounded-full bg-white"
+          style={{ width: "4.4vh", height: "4.4vh" }}
+        >
+          <img
+            src={g1LogoUrl}
+            alt="G1"
+            className="w-auto"
+            style={{ height: "3.2vh" }}
+            loading="eager"
+          />
+        </span>
+        <span>{rest || "Notícias"}</span>
+      </span>
+    );
+  };
+
   return (
-    <div className="w-full h-full bg-black/80 backdrop-blur-xl text-white flex items-center border-t-4 border-[#006CFF] shadow-2xl overflow-hidden">
+    <div className="w-full h-full bg-black/70 backdrop-blur-xl text-white flex items-center border-t-4 border-[#006CFF] shadow-2xl overflow-hidden">
       <div className="bg-[#006CFF] h-full px-6 flex items-center justify-center font-black uppercase tracking-wider text-xl shadow-lg z-20 whitespace-nowrap">
-        {news[0]?.source || "Notícias"}
+        {renderSourceLabel(news[0]?.source || "Notícias")}
       </div>
       <div className="flex-1 overflow-hidden relative h-full flex items-center">
         {news.length > 0 ? (
@@ -102,7 +143,7 @@ function NewsTicker({ rssUrl }: { rssUrl: string }) {
           {news.map((item, i) => (
             <span key={i} className="text-2xl font-medium flex items-center gap-2">
               <span className="text-[#006CFF] font-bold">•</span>
-              {item.title}
+              {renderNewsTitle(item.title)}
             </span>
           ))}
         </motion.div>
@@ -113,7 +154,7 @@ function NewsTicker({ rssUrl }: { rssUrl: string }) {
             </div>
         )}
       </div>
-      <div className="px-6 h-full flex items-center bg-black/80 backdrop-blur-xl z-20 border-l border-white/10">
+      <div className="px-6 h-full flex items-center bg-black/70 backdrop-blur-xl z-20 border-l border-white/10">
          <ClockWidget />
       </div>
     </div>
@@ -354,7 +395,7 @@ export default function TVPlayer() {
                    transition={{ duration: 0.55, ease: "easeOut" }}
                    className="absolute left-1/2 top-[10%] z-50 max-w-[32vw] -translate-x-1/2"
                  >
-                   <div className="flex items-center gap-[0.6vw] rounded-[0.7vw] bg-black/80 backdrop-blur-xl border border-white/10 shadow-2xl px-[0.8vw] py-[0.6vh]">
+                   <div className="flex items-center gap-[0.6vw] rounded-[0.7vw] bg-black/70 backdrop-blur-xl border border-white/10 shadow-2xl px-[0.8vw] py-[0.6vh]">
                      {currentItem.thumbnail && (
                        <img
                          src={currentItem.thumbnail}

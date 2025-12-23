@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../utils/supabase/client";
 import { supabaseUrl, publicAnonKey } from "../../utils/supabase/info";
-import { Tv, Smartphone, Settings, LogOut, Loader2, Play, ListVideo, ImageIcon, Store, Home, QrCode, Info } from "lucide-react";
+import { Tv, Smartphone, Settings, LogOut, Loader2, Play, ListVideo, ImageIcon, Store, Home, QrCode, Info, LayoutDashboard } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { toast } from "sonner@2.0.3";
 import QRCode from "react-qr-code";
@@ -153,6 +153,17 @@ export default function ClientHome() {
                 hoverBorder="group-hover:border-emerald-500/50"
             />
 
+            {/* Dashboard */}
+            <HomeButton 
+               icon={LayoutDashboard} 
+               title="Dashboard" 
+               description="Ver métricas e eventos"
+               onClick={() => navigate('/admin/dashboard')}
+               gradient="from-blue-600 to-blue-800"
+               hoverBorder="group-hover:border-blue-500/50"
+
+            />
+
              {/* Content Manager */}
              <HomeButton 
                 icon={ImageIcon} 
@@ -227,7 +238,9 @@ export default function ClientHome() {
   );
 }
 
-function HomeButton({ icon: Icon, title, description, onClick, gradient, hoverBorder, className }: any) {
+function HomeButton({ icon: Icon, title, description, onClick, gradient, iconBg, hoverBorder, highlightText, className }: any) {
+    const borderHoverClass = hoverBorder || "group-hover:border-transparent";
+    const iconBgClass = iconBg || `bg-gradient-to-br ${gradient}`;
     return (
         <button 
             onClick={onClick}
@@ -236,13 +249,15 @@ function HomeButton({ icon: Icon, title, description, onClick, gradient, hoverBo
             {/* Border Gradient Background */}
             <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
             
-            <div className="relative h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-8 flex flex-col items-center text-center gap-6 transition-colors group-hover:border-transparent z-10">
-                <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg mb-2 group-hover:scale-110 transition-transform duration-300`}>
+            <div className={`relative h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl p-8 flex flex-col items-center text-center gap-6 transition-colors z-10 ${borderHoverClass}`}>
+                <div className={`w-20 h-20 rounded-full ${iconBgClass} flex items-center justify-center shadow-lg mb-2 group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className="w-10 h-10 text-white" />
                 </div>
                 
                 <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-100 transition-colors">{title}</h3>
+                    <h3 className={`text-2xl font-bold text-slate-900 dark:text-white transition-colors ${highlightText || "group-hover:text-blue-600 dark:group-hover:text-blue-100"}`}>
+                        {title}
+                    </h3>
                     <p className="text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">{description}</p>
                 </div>
 
