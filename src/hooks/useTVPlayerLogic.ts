@@ -562,6 +562,7 @@ export function useTVPlayerLogic() {
 
   const handleNext = useCallback(() => {
     if (playlist.length === 0) return;
+    setIsPlaying(true);
 
     if (requestQueue.length > 0) {
         const nextId = requestQueue[0];
