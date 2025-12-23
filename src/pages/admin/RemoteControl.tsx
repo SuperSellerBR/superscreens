@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { usePlayerControl } from "../../hooks/usePlayerControl";
-import { projectId, publicAnonKey } from "../../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../../utils/supabase/info";
 import { supabase } from "../../utils/supabase/client";
 import { Loader2, Play, Pause, SkipForward, SkipBack, Volume2, VolumeX, List, Tv, Wifi, WifiOff, Trash2, Smartphone, Search, RefreshCw, Disc, Newspaper, LayoutTemplate, Square, Columns, LogOut, Home, Shuffle, MonitorPlay, Copy, ExternalLink, QrCode } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -61,7 +61,7 @@ function UserSelector() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users`, {
+    fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/users`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
     })
     .then(res => res.json())
@@ -175,7 +175,7 @@ function RemoteInterface({ userId, isAdmin }: { userId: string, isAdmin: boolean
 
   // Fetch Logo
   useEffect(() => {
-    fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/logo?uid=${userId}`, {
+    fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/logo?uid=${userId}`, {
          headers: { 'Authorization': `Bearer ${publicAnonKey}` }
     })
     .then(res => res.json())
@@ -190,7 +190,7 @@ function RemoteInterface({ userId, isAdmin }: { userId: string, isAdmin: boolean
 
   // Load Playlist Metadata
   useEffect(() => {
-     fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlist/active?uid=${userId}`, {
+     fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlist/active?uid=${userId}`, {
          headers: { 'Authorization': `Bearer ${publicAnonKey}` }
      })
      .then(res => res.json())
@@ -202,7 +202,7 @@ function RemoteInterface({ userId, isAdmin }: { userId: string, isAdmin: boolean
   // Load Available Playlists
   useEffect(() => {
       if (showPlaylists && token) {
-          fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists`, {
+          fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists`, {
               headers: { 'Authorization': `Bearer ${token}` }
           })
           .then(res => res.json())
@@ -213,7 +213,7 @@ function RemoteInterface({ userId, isAdmin }: { userId: string, isAdmin: boolean
               const basePlaylists = data.playlists || [];
               const enriched = await Promise.all(basePlaylists.map(async (pl: any) => {
                   try {
-                      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/${pl.id}`, {
+                      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/${pl.id}`, {
                           headers: { 'Authorization': `Bearer ${token}` }
                       });
                       if (!res.ok) return { ...pl, durationMinutes: null };
@@ -240,7 +240,7 @@ function RemoteInterface({ userId, isAdmin }: { userId: string, isAdmin: boolean
       const toastId = toast.loading("Trocando playlist...");
       try {
           // 1. Get Content
-          const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/${playlistId}`, {
+          const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/${playlistId}`, {
               headers: { 'Authorization': `Bearer ${token}` }
           });
           const data = await res.json();
@@ -248,7 +248,7 @@ function RemoteInterface({ userId, isAdmin }: { userId: string, isAdmin: boolean
           if (!data.items) throw new Error("Playlist vazia");
 
           // 2. Publish
-          await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlist/publish`, {
+          await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlist/publish`, {
               method: 'POST',
               headers: { 
                   'Authorization': `Bearer ${token}`,

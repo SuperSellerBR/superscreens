@@ -10,7 +10,7 @@ import { Switch } from "../../components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table";
 import { Badge } from "../../components/ui/badge";
 import { toast } from "sonner@2.0.3";
-import { projectId, publicAnonKey } from "../../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../../utils/supabase/info";
 import { supabase } from "../../utils/supabase/client";
 
 type UserRole = 'admin' | 'advertiser' | 'client';
@@ -69,7 +69,7 @@ export default function UsersPage() {
 
     setIsUploading(true);
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/media/upload-token`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/media/upload-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${publicAnonKey}` },
         body: JSON.stringify({ filename: `avatar_${Date.now()}_${file.name.replace(/\s+/g, '-')}` })
@@ -100,7 +100,7 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/users`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
       const data = await res.json();
@@ -143,8 +143,8 @@ export default function UsersPage() {
 
     try {
       const url = editingId 
-        ? `https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users/${editingId}`
-        : `https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users`;
+        ? `${supabaseUrl}/functions/v1/make-server-70a2af89/users/${editingId}`
+        : `${supabaseUrl}/functions/v1/make-server-70a2af89/users`;
       
       const method = editingId ? 'PATCH' : 'POST';
 
@@ -176,7 +176,7 @@ export default function UsersPage() {
     if (!confirm("Tem certeza que deseja excluir este usuário?")) return;
 
     try {
-      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users/${id}`, {
+      await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/users/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
@@ -218,7 +218,7 @@ export default function UsersPage() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users/sync`, {
+        const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/users/sync`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${session.access_token}`,

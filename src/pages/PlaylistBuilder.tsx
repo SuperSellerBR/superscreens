@@ -11,7 +11,7 @@ import { GripVertical, Clock, Trash2, Play, Search, Youtube, Image as ImageIcon,
 import { useState, useRef, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { Switch } from "../components/ui/switch";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../utils/supabase/info";
 import { supabase } from "../utils/supabase/client";
 import { toast } from "sonner@2.0.3";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -194,10 +194,10 @@ export default function PlaylistBuilder() {
       // Load API Keys & Template
       try {
         const [ytRes, tplRes] = await Promise.all([
-          fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/youtube`, {
+          fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/youtube`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
-          fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/template`, {
+          fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/template`, {
             headers: { 'Authorization': `Bearer ${token}` }
           })
         ]);
@@ -223,7 +223,7 @@ export default function PlaylistBuilder() {
 
   const loadMediaLibrary = async (token = sessionToken) => {
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/media`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/media`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -236,7 +236,7 @@ export default function PlaylistBuilder() {
   const loadPlaylists = async (token = sessionToken) => {
     setIsLoadingPlaylists(true);
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -244,7 +244,7 @@ export default function PlaylistBuilder() {
 
       const enriched = await Promise.all(loadedPlaylists.map(async (playlist: PlaylistMeta) => {
         try {
-          const detailsRes = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/${playlist.id}`, {
+          const detailsRes = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/${playlist.id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (!detailsRes.ok) return { ...playlist, itemsCount: 0, durationMinutes: 0 };
@@ -276,7 +276,7 @@ export default function PlaylistBuilder() {
   const createDefaultPlaylist = async () => {
     const defaultPlaylist = { id: 'default', name: 'Playlist Principal', createdAt: new Date().toISOString() };
     try {
-      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/index`, {
+      await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/index`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
         body: JSON.stringify({ playlists: [defaultPlaylist] })
@@ -309,7 +309,7 @@ export default function PlaylistBuilder() {
     const updatedPlaylists = [...playlists, newPlaylist];
     
     try {
-      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/index`, {
+      await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/index`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
         body: JSON.stringify({ playlists: updatedPlaylists })
@@ -337,7 +337,7 @@ export default function PlaylistBuilder() {
 
     try {
        // Update Index
-       await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/index`, {
+       await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/index`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
         body: JSON.stringify({ playlists: updatedPlaylists })
@@ -348,7 +348,7 @@ export default function PlaylistBuilder() {
       // The backend probably handles cleanup or we just leave orphan keys for now (it's KV store).
       // Update: Backend has a DELETE endpoint for playlists/:id
       
-      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/${idToDelete}`, {
+      await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/${idToDelete}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${sessionToken}` }
       });
@@ -377,7 +377,7 @@ export default function PlaylistBuilder() {
           setSessionToken(token);
       }
 
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/${id}`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -411,7 +411,7 @@ export default function PlaylistBuilder() {
     if (!currentPlaylistId) return;
     setIsSaving(true);
     try {
-      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlists/${currentPlaylistId}`, {
+      await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlists/${currentPlaylistId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
         body: JSON.stringify({ items, shuffle: isShuffle })
@@ -489,14 +489,14 @@ export default function PlaylistBuilder() {
       await handleSave(true);
 
       // 2. Save Template Preference
-      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/template`, {
+      await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/template`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
         body: JSON.stringify({ template: activeTemplate })
       });
 
       // 3. Publish to active_playlist
-      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlist/publish`, {
+      const response = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlist/publish`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

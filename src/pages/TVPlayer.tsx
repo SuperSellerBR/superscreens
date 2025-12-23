@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../utils/supabase/info";
 import { MediaItem } from "../components/player/MediaItem";
 import { AdPlayer } from "../components/player/AdPlayer";
 import { Play, Pause, Loader2, WifiOff, Clock, Volume2, VolumeX, ArrowLeft, Shuffle, Maximize, Minimize, Newspaper, Repeat, Square, Columns, HelpCircle, LogOut } from "lucide-react";
@@ -35,7 +35,7 @@ function NewsTicker({ rssUrl }: { rssUrl: string }) {
 
     const fetchNews = async () => {
       try {
-        const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/proxy/rss?url=${encodeURIComponent(rssUrl)}`, {
+        const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/proxy/rss?url=${encodeURIComponent(rssUrl)}`, {
            headers: { 'Authorization': `Bearer ${publicAnonKey}` }
         });
         

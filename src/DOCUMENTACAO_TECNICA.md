@@ -146,7 +146,7 @@ O código atual usa imports virtuais do Figma (`import img from "figma:asset/...
 *   Substitua os imports no código: `import img from "/assets/logo.png"`.
 
 ### 2. Rotas da API
-O frontend faz chamadas para `https://${projectId}.supabase.co/functions/v1/make-server...`.
+O frontend faz chamadas para `${supabaseUrl}/functions/v1/make-server...`.
 **Ação Necessária**:
 *   Se for usar **Vercel**, considere migrar as funções do `index.tsx` para **API Routes** (`/api/...`) se for mudar para Next.js, ou mantenha as Edge Functions no Supabase e apenas atualize a variável de ambiente `VITE_API_URL` no frontend.
 

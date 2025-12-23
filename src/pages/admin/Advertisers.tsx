@@ -7,7 +7,7 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
-import { projectId, publicAnonKey } from "../../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../../utils/supabase/info";
 import { supabase } from "../../utils/supabase/client";
 import { toast } from "sonner@2.0.3";
 
@@ -74,7 +74,7 @@ export default function Advertisers() {
                 setSelectedAdvertiser(userData);
                 
                 // Fetch user logo separately if needed or just let it be empty/fallback
-                fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/logo?uid=${session.user.id}`, {
+                fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/logo?uid=${session.user.id}`, {
                     headers: { 'Authorization': `Bearer ${publicAnonKey}` }
                 })
                 .then(res => res.json())
@@ -104,7 +104,7 @@ export default function Advertisers() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/users`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
       const data = await res.json();
@@ -128,7 +128,7 @@ export default function Advertisers() {
           if (!authToken) {
               throw new Error("Sessão inválida");
           }
-          const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/advertisers/${advertiserId}/media`, {
+          const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/advertisers/${advertiserId}/media`, {
              headers: { 'Authorization': `Bearer ${authToken}` }
           });
           const data = await res.json();
@@ -167,7 +167,7 @@ export default function Advertisers() {
 
           const updatedMedia = [...advertiserMedia, newItem];
 
-          const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/advertisers/${selectedAdvertiser.id}/media`, {
+          const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/advertisers/${selectedAdvertiser.id}/media`, {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
@@ -212,7 +212,7 @@ export default function Advertisers() {
       setAdvertiserMedia(updatedMedia);
 
       try {
-          const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/advertisers/${selectedAdvertiser.id}/media/${mediaId}`, {
+          const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/advertisers/${selectedAdvertiser.id}/media/${mediaId}`, {
               method: 'DELETE',
               headers: {
                   'Authorization': `Bearer ${authToken}`

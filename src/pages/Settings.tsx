@@ -9,7 +9,7 @@ import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Slider } from "../components/ui/slider";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../utils/supabase/info";
 import { supabase } from "../utils/supabase/client";
 import { toast } from "sonner@2.0.3";
 import { AdminLayout } from "../components/layout/AdminLayout";
@@ -121,19 +121,19 @@ export default function Settings() {
     setIsLoading(true);
     try {
       const [ytRes, newsRes, logoRes, tplRes, cycleRes] = await Promise.all([
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/youtube`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/youtube`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/news`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/news`, {
             headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/logo`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/logo`, {
             headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/template`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/template`, {
             headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/cycle`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/cycle`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -169,27 +169,27 @@ export default function Settings() {
     const token = sessionToken || publicAnonKey;
     try {
       await Promise.all([
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/youtube`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/youtube`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ apiKey: youtubeKey })
         }),
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/news`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/news`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ rssUrl: rssUrl })
         }),
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/logo`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/logo`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ logoUrl: logoUrl })
         }),
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/template`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/template`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ template: activeTemplate })
         }),
-        fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/cycle`, {
+        fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/cycle`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ contentRatio: contentRatio })

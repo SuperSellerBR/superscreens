@@ -6,7 +6,7 @@ import { Upload, Image as ImageIcon, Video, LayoutTemplate, Search, Trash2, Load
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useRef, useState } from "react";
-import { projectId, publicAnonKey } from "@/utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "@/utils/supabase/info";
 import { toast } from "sonner@2.0.3";
 import { supabase } from "@/utils/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +30,7 @@ export default function ContentManager() {
 
   const fetchMedia = async () => {
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/media`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/media`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
       const data = await res.json();
@@ -69,7 +69,7 @@ export default function ContentManager() {
     setIsUploading(true);
     try {
       // 1. Get Signed Upload Token from Server
-      const tokenRes = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/media/upload-token`, {
+      const tokenRes = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/media/upload-token`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export default function ContentManager() {
         ownerId: userId // Associate media with uploader
       };
 
-      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/media`, {
+      await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/media`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export default function ContentManager() {
     if (!confirm("Tem certeza que deseja excluir?")) return;
 
     try {
-      await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/media/${id}`, {
+      await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/media/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });

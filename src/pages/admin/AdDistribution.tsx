@@ -5,7 +5,7 @@ import { Search, Loader2, Save, Store, Megaphone, Check } from "lucide-react";
 import { Input } from "../../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { toast } from "sonner@2.0.3";
-import { projectId, publicAnonKey } from "../../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../../utils/supabase/info";
 import { supabase } from "../../utils/supabase/client";
 
 interface UserData {
@@ -32,7 +32,7 @@ export default function AdDistributionPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/users`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/users`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
       const data = await res.json();
@@ -49,7 +49,7 @@ export default function AdDistributionPage() {
     setLinkedAdvertisers([]); // Reset while loading
     
     try {
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/advertise/distribute/${client.id}`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/advertise/distribute/${client.id}`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
       const data = await res.json();
@@ -66,7 +66,7 @@ export default function AdDistributionPage() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/advertise/distribute`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/advertise/distribute`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

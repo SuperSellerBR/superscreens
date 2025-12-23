@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../utils/supabase/info";
 import ReactPlayer from "react-player";
 import { Loader2, AlertTriangle, CheckCircle, Play, SkipForward } from "lucide-react";
 
@@ -28,7 +28,7 @@ export default function TestPlayer() {
     const fetchPlaylist = async () => {
       addLog("Iniciando fetch da playlist...");
       try {
-        const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlist/active`, {
+        const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlist/active`, {
            headers: { 'Authorization': `Bearer ${publicAnonKey}` }
         });
         

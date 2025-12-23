@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../utils/supabase/client";
-import { projectId, publicAnonKey } from "../../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../../utils/supabase/info";
 import { Tv, Smartphone, Settings, LogOut, Loader2, Play, ListVideo, ImageIcon, Store, Home, QrCode, Info } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { toast } from "sonner@2.0.3";
@@ -32,7 +32,7 @@ export default function ClientHome() {
       
       // Fetch Logo
       try {
-        const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/logo?uid=${session.user.id}`, {
+        const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/logo?uid=${session.user.id}`, {
              headers: { 'Authorization': `Bearer ${publicAnonKey}` }
         });
         const data = await res.json();

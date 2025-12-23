@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../utils/supabase/info";
 import { supabase } from "../utils/supabase/client";
 import { Loader2, Music, CheckCircle, Tv, Play, Search, Disc, Mic2, Sparkles, Maximize, Minimize, ListMusic, MonitorPlay, Wifi, WifiOff, Home, RefreshCw } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -217,7 +217,7 @@ export default function RequestRemote() {
 
   const fetchPlaylist = async () => {
     try {
-      if (!projectId || !publicAnonKey) {
+      if (!supabaseUrl || !publicAnonKey) {
         throw new Error("Configuração do projeto ausente");
       }
 
@@ -226,13 +226,13 @@ export default function RequestRemote() {
 
       // Parallel fetch: Playlist AND Advertisers to ensure correct filtering
       const [plRes, adsRes, logoRes] = await Promise.all([
-         fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlist/active${query}`, {
+         fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlist/active${query}`, {
              headers: { 'Authorization': `Bearer ${publicAnonKey}` }
          }),
-         fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/advertisers${query}`, { 
+         fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/advertisers${query}`, { 
              headers: { 'Authorization': `Bearer ${publicAnonKey}` } 
          }),
-         fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/logo${query}`, { 
+         fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/logo${query}`, { 
              headers: { 'Authorization': `Bearer ${publicAnonKey}` } 
          })
       ]);
@@ -307,7 +307,7 @@ export default function RequestRemote() {
         });
         
         // Log request to server
-        const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/jukebox/request`, {
+        const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/jukebox/request`, {
             method: 'POST',
             headers: { 
                 'Authorization': `Bearer ${publicAnonKey}`,

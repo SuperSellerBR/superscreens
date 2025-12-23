@@ -5,7 +5,7 @@ import { Badge } from "../../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
 import { Loader2, User, Play, Image as ImageIcon, Video as VideoIcon, LayoutTemplate, X, Megaphone } from "lucide-react";
-import { projectId, publicAnonKey } from "../../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../../utils/supabase/info";
 import { supabase } from "../../utils/supabase/client";
 import { toast } from "sonner@2.0.3";
 
@@ -38,7 +38,7 @@ export default function MyAdvertisers() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
 
-      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/advertisers?uid=${session.user.id}`, {
+      const res = await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/advertisers?uid=${session.user.id}`, {
         headers: { 'Authorization': `Bearer ${publicAnonKey}` }
       });
       const data = await res.json();

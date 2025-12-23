@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { supabaseUrl, publicAnonKey } from "../utils/supabase/info";
 import { supabase } from "../utils/supabase/client";
 import { toast } from "sonner@2.0.3";
 import { PlaylistItem } from "../types/player";
@@ -364,7 +364,7 @@ export function useTVPlayerLogic() {
   useEffect(() => {
     const sendHeartbeat = async () => {
         try {
-            await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/player/heartbeat`, {
+            await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/player/heartbeat`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -406,7 +406,7 @@ export function useTVPlayerLogic() {
       const trackImpression = async () => {
          try {
              if (currentItem.type === 'ad' || true) { 
-                 await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/player/impression`, {
+                 await fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/player/impression`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -432,12 +432,12 @@ export function useTVPlayerLogic() {
     try {
         const query = userId ? `?uid=${userId}` : '';
         const [plRes, tplRes, adsRes, logoRes, cycleRes, newsRes] = await Promise.all([
-           fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/playlist/active${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
-           fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/template${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
-           fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/advertisers${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
-           fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/logo${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
-           fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/cycle${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
-           fetch(`https://${projectId}.supabase.co/functions/v1/make-server-70a2af89/config/news${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } })
+           fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/playlist/active${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
+           fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/template${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
+           fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/advertisers${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
+           fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/logo${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
+           fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/cycle${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } }),
+           fetch(`${supabaseUrl}/functions/v1/make-server-70a2af89/config/news${query}`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } })
         ]);
         
         const plData = await plRes.json();
